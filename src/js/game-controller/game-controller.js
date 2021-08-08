@@ -1,85 +1,44 @@
 import {clearField, renderField} from "../render-controller/render-controller";
 
-export let cellsList = []; //матрица ячеек
+export let matrix = []; //матрица ячеек
 const rowCount = 20;
-const collCount = 20;
-export let whichStep = true
+const colCount = 20;
+let whichStep = true
 let isGameOver = false
 
 //меняем статус хода
-export const changeStep = () => {
-
-  console.log("-> whichStep before", whichStep);
+const changeStep = () => {
   whichStep = !whichStep
-  console.log("-> whichStep after", whichStep);
 }
 
-//создние матрицы из всех направлений для поиска победной линии
-export const crateListForWinTest = (partOfCellsList) =>{
-  const horizontalLine = partOfCellsList[4]
-  const verticalLine = []
-  const diagonalLeftLine = []
-  const diagonalRightLine = []
-
-  for(let i = 0; i < 9; i++){
-    verticalLine.push(partOfCellsList[i][4])
-  }
-  let count = 8
-  for(let i = 0; i < 9; i++){
-      diagonalLeftLine.push(partOfCellsList[i][count])
-      count--
-  }
-  for(let i = 0; i < 9; i++){
-      diagonalRightLine.push(partOfCellsList[i][i])
-
-  }
-  return [horizontalLine, verticalLine, diagonalLeftLine, diagonalRightLine]
+//отмечаем ход в матрице
+const changeCellInCellList = (row, col) => {
+  matrix[row][col] = whichStep ? '1' : '2'
 }
 
-//проверяет все направления на существование победной линии
-export const testListForWin = (rowId, colId) =>{
-
-  const partOfCellsList = copyPartOfCellsList(rowId, colId)
-
-  const listForWinTest = crateListForWinTest(partOfCellsList)
-
-  const currentStep = whichStep ? '1': '2'
-  let isWin = false
-  listForWinTest.forEach(line=>{
-    for(let i = 4; i < 9; i++){
-      if (line[i-4] === currentStep
-        && line[i-3] === currentStep
-        && line[i-2] === currentStep
-        && line[i-1] === currentStep
-        && line[i] === currentStep){
-        isWin = true
-      }
-    }
-  })
-  return isWin
-}
 // увеличивает матрицу в одну из сторон
-export const increaseField = (row, coll) => {
-  const width = cellsList[0].length
-  const height = cellsList.length
-  let resultList = cellsList
+const increaseField = (row, coll) => {
+  const width = matrix[0].length
+  const height = matrix.length
+
+  let resultList = [...matrix]
   let isIncreased = false
 
   if(row<=4){
     isIncreased = true
-    resultList = increaseTopSide(cellsList, width)
+    resultList = increaseTopSide(resultList, width)
   }
   if(row >= height - 5){
     isIncreased = true
-    resultList = increaseBottomSide(cellsList, width)
+    resultList = increaseBottomSide(resultList, width)
   }
   if(coll <= 4){
     isIncreased = true
-    resultList =  increaseLeftSide(cellsList, height)
+    resultList =  increaseLeftSide(resultList, height)
   }
   if(coll >= width - 5){
     isIncreased = true
-    resultList = increaseRightSide(cellsList, height)
+    resultList = increaseRightSide(resultList, height)
   }
   return { isIncreased, resultList}
 }
@@ -109,6 +68,7 @@ const increaseBottomSide = (list, width) => {
 
   return [...list, ...additionalList]
 }
+
 //увеличение левого предела
 const increaseLeftSide = (list) =>{
 
@@ -128,67 +88,110 @@ const increaseRightSide = (list) => {
   return list.map(line=> [...line, ...additionalPart])
 }
 
+//создние матрицы из всех направлений для поиска победной линии
+const crateListOfDirections = (partOfCellsList) =>{
+  const horizontalLine = partOfCellsList[4]
+  const verticalLine = []
+  const diagonalLeftLine = []
+  const diagonalRightLine = []
+
+  for(let i = 0; i < 9; i++){
+    verticalLine.push(partOfCellsList[i][4])
+  }
+  let count = 8
+  for(let i = 0; i < 9; i++){
+    diagonalLeftLine.push(partOfCellsList[i][count])
+    count--
+  }
+  for(let i = 0; i < 9; i++){
+    diagonalRightLine.push(partOfCellsList[i][i])
+
+  }
+  return [horizontalLine, verticalLine, diagonalLeftLine, diagonalRightLine]
+}
+
 //создаем копию матрицы из 9х9 ячеек вокруг кликнутой
-export const copyPartOfCellsList = (row, coll) => {
+const getPartOfMatrix = (row, coll) => {
   const partOfCellsList = []
   const beginRow = row - 4
   const beginColl = coll - 4
+
   for (let i = beginRow; i <= beginRow + 8; i++) {
     const rowList = []
     for (let j = beginColl; j <= beginColl + 8; j++) {
-      rowList.push(cellsList[i][j])
+      rowList.push(matrix[i][j])
     }
     partOfCellsList.push(rowList)
   }
   return partOfCellsList
 };
+//проверяет все направления на существование победной линии
+const parsePartOfMatrixForWin = (rowId, colId) =>{
+  const currentStep = whichStep ? '1': '2'
 
-//отмечаем ход в матрице
-export const changeCellInCellList = (row, col) => {
-  cellsList[row][col] = whichStep ? '1' : '2'
+  const partOfMatrix = getPartOfMatrix(rowId, colId)
+
+  const directionsList = crateListOfDirections(partOfMatrix)
+
+  directionsList.forEach(direction=>{
+    for(let i = 4; i < 9; i++){
+      if (direction[i-4] === currentStep
+        &&direction[i-3] === currentStep
+        && direction[i-2] === currentStep
+        && direction[i-1] === currentStep
+        && direction[i] === currentStep){
+        isGameOver =  true
+      }
+    }
+  })
+  return false
 }
 
-//заполняем матрицу нулями
-export const fillCellList = (rows = rowCount, cols = collCount) => {
-  for (let i = 0; i < rows; i++) {
-    cellsList[i] = []
-    for (let j = 0; j < cols; j++) {
-      cellsList[i][j] = '0'
-    }
-  }
-};
 
 //проверка на окончание игры
-export const gameOver = (rowId, colId) => {
-  const isGameOver = testListForWin(rowId, colId)
+const checkWin = (rowId, colId) => {
 
-  if(!isGameOver){
-    return
-  }
+  parsePartOfMatrixForWin(rowId, colId)
+}
 
-  const whoWin = whichStep? `крестики` : `нолики`
-  alert(`в этом матче победили ${whoWin}`)
-  fillCellList(rowCount, collCount)
-  clearField()
-  renderField(cellsList)
-
+const resetGame = () => {
+  const winner = whichStep ? `крестики` : `нолики`
+  console.log("-> winner", winner);
+  // alert(`в этом матче победили ${winner}`)
+  // fillMatrix(rowCount, colCount)
+  // clearField()
+  // renderField(matrix)
 }
 
 //ход
 export const move = (rowId, colId)  => {
 
-
   changeCellInCellList(rowId, colId)
 
+  checkWin(rowId, colId)
   changeStep()
+
   const {isIncreased, resultList} = increaseField(rowId, colId)
   if(isIncreased){
-    cellsList = resultList
+    matrix = resultList
     clearField()
-    renderField(cellsList)
+    renderField(matrix)
   }
-  clearField()
-  renderField(cellsList)
-  gameOver(rowId, colId)
 
+  clearField()
+  renderField(matrix)
+
+  if(isGameOver){
+    resetGame()
+  }
 }
+
+//заполняем матрицу нулями
+export const fillMatrix = (rows = rowCount, cols = colCount) => {
+  for (let i = 0; i < rows; i++) {
+    matrix[i] = []
+    for (let j = 0; j < cols; j++) {
+      matrix[i][j] = '0'
+    }
+  }
+};
