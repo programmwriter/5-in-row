@@ -1,4 +1,4 @@
-import {move, whichStep} from "../game-controller/game-controller";
+import {move} from "../game-controller/game-controller";
 
 
 const field = document.querySelector('.field')
@@ -30,17 +30,12 @@ const createCell = (row, col, value)=>{
   return cell
 }
 
-
 export const clearField = () => {
   field.innerHTML = ''
 }
 
 const cellClickHandler = ({target}) => {
   const {rowId, colId} = target.dataset
-
-  const className = whichStep ? crossClassName : zeroClassName;
-  target.classList.add(className)
-  target.removeEventListener('click', cellClickHandler)
 
   move(rowId, colId)
 }
