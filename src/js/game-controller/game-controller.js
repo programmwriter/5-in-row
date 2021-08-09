@@ -12,12 +12,12 @@ const changeStep = () => {
 }
 
 //отмечаем ход в матрице
-const changeCellInCellList = (row, col) => {
+const changeCellInMatrix = (row, col) => {
   matrix[row][col] = whichStep ? '1' : '2'
 }
 
 // увеличивает матрицу в одну из сторон
-const increaseField = (row, coll) => {
+const increaseField = (row, col) => {
   const width = matrix[0].length
   const height = matrix.length
 
@@ -32,15 +32,17 @@ const increaseField = (row, coll) => {
     isIncreased = true
     resultList = increaseBottomSide(resultList, width)
   }
-  if(coll <= 4){
+  if(col <= 4){
     isIncreased = true
     resultList =  increaseLeftSide(resultList, height)
   }
-  if(coll >= width - 5){
+  if(col >= width - 5){
     isIncreased = true
     resultList = increaseRightSide(resultList, height)
   }
-  return { isIncreased, resultList}
+  if(isIncreased){
+    matrix = resultList
+  }
 }
 
 //увеличение верхнего предела
@@ -111,25 +113,29 @@ const crateListOfDirections = (partOfCellsList) =>{
 }
 
 //создаем копию матрицы из 9х9 ячеек вокруг кликнутой
-const getPartOfMatrix = (row, coll) => {
-  const partOfCellsList = []
-  const beginRow = row - 4
-  const beginColl = coll - 4
+const getPartOfMatrix = (row, col) => {
+  const partOfMatrix = []
+  const beginRow = row < 4? row: row - 4;
+  const beginCol = col < 4? col: col - 4;
+  const endRow = +beginRow + 8;
+  const endCol = +beginCol + 8;
 
-  for (let i = beginRow; i <= beginRow + 8; i++) {
+  for (let i = beginRow; i <= endRow; i++) {
     const rowList = []
-    for (let j = beginColl; j <= beginColl + 8; j++) {
+    for (let j = beginCol; j <= endCol + 8; j++) {
       rowList.push(matrix[i][j])
     }
-    partOfCellsList.push(rowList)
+    partOfMatrix.push(rowList)
   }
-  return partOfCellsList
+  return partOfMatrix
 };
+
 //проверяет все направления на существование победной линии
 const parsePartOfMatrixForWin = (rowId, colId) =>{
   const currentStep = whichStep ? '1': '2'
 
   const partOfMatrix = getPartOfMatrix(rowId, colId)
+  console.log("-> partOfMatrix", partOfMatrix);
 
   const directionsList = crateListOfDirections(partOfMatrix)
 
@@ -166,17 +172,10 @@ const resetGame = () => {
 //ход
 export const move = (rowId, colId)  => {
 
-  changeCellInCellList(rowId, colId)
-
+  changeCellInMatrix(rowId, colId)
+  increaseField(rowId, colId)
   checkWin(rowId, colId)
   changeStep()
-
-  const {isIncreased, resultList} = increaseField(rowId, colId)
-  if(isIncreased){
-    matrix = resultList
-    clearField()
-    renderField(matrix)
-  }
 
   clearField()
   renderField(matrix)
