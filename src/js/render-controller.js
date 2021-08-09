@@ -6,6 +6,7 @@ const crossClassName = 'cross'
 const zeroClassName = 'zero'
 
 export const renderField = (matrix) =>{
+  console.log("-> matrix", matrix);
   for(let i =0; i<matrix.length; i++){
     const line = document.createElement('ul')
     for(let j =0; j<matrix[i].length; j++){

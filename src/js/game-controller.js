@@ -189,6 +189,7 @@ export const move = (rowId, colId)  => {
 
 //заполняем матрицу нулями
 export const fillMatrix = (rows = rowCount, cols = colCount) => {
+  matrix = []
   for (let i = 0; i < rows; i++) {
     matrix[i] = []
     for (let j = 0; j < cols; j++) {
