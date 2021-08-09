@@ -1,4 +1,4 @@
-import {clearField, renderField} from "../render-controller/render-controller";
+import {clearField, renderField, toggleModal} from "../render-controller/render-controller";
 
 export let matrix = []; //матрица ячеек
 const rowCount = 20;
@@ -10,6 +10,8 @@ let isGameOver = false
 const changeStep = () => {
   whichStep = !whichStep
 }
+// Возвращает победителя
+const whoWinner = () => whichStep ? `крестики` : `нолики`
 
 //отмечаем ход в матрице
 const changeCellInMatrix = (row, col) => {
@@ -135,7 +137,6 @@ const parsePartOfMatrixForWin = (rowId, colId) =>{
   const currentStep = whichStep ? '1': '2'
 
   const partOfMatrix = getPartOfMatrix(rowId, colId)
-  console.log("-> partOfMatrix", partOfMatrix);
 
   const directionsList = crateListOfDirections(partOfMatrix)
 
@@ -153,36 +154,40 @@ const parsePartOfMatrixForWin = (rowId, colId) =>{
   return false
 }
 
-
 //проверка на окончание игры
 const checkWin = (rowId, colId) => {
-
   parsePartOfMatrixForWin(rowId, colId)
 }
-
-const resetGame = () => {
-  const winner = whichStep ? `крестики` : `нолики`
-  console.log("-> winner", winner);
-  // alert(`в этом матче победили ${winner}`)
-  // fillMatrix(rowCount, colCount)
-  // clearField()
-  // renderField(matrix)
+//открывает модальное окно при окончании игры
+const endGame = () => {
+  toggleModal(whoWinner())
 }
 
-//ход
-export const move = (rowId, colId)  => {
+//рестар игры
+export const resetGame = () => {
+  toggleModal(whoWinner())
+  fillMatrix(rowCount, colCount)
+  clearField()
+  renderField(matrix)
+  isGameOver = false
+  whichStep = true
+}
 
+//ход игрока
+export const move = (rowId, colId)  => {
+  console.log('winner', whoWinner())
   changeCellInMatrix(rowId, colId)
   increaseField(rowId, colId)
   checkWin(rowId, colId)
+
+  if(isGameOver){
+    endGame()
+  }
   changeStep()
 
   clearField()
   renderField(matrix)
 
-  if(isGameOver){
-    resetGame()
-  }
 }
 
 //заполняем матрицу нулями
