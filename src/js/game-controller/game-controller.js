@@ -1,4 +1,4 @@
-import {clearField, renderField, toggleModal} from "../render-controller/render-controller";
+import {clearField, renderField, openModal, closeModal} from "../render-controller/render-controller";
 
 export let matrix = []; //матрица ячеек
 const rowCount = 20;
@@ -160,12 +160,12 @@ const checkWin = (rowId, colId) => {
 }
 //открывает модальное окно при окончании игры
 const endGame = () => {
-  toggleModal(whoWinner())
+  openModal(whoWinner())
 }
 
 //рестар игры
 export const resetGame = () => {
-  toggleModal(whoWinner())
+  closeModal()
   fillMatrix(rowCount, colCount)
   clearField()
   renderField(matrix)
