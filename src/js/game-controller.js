@@ -117,8 +117,8 @@ const crateListOfDirections = (partOfCellsList) =>{
 //создаем копию матрицы из 9х9 ячеек вокруг кликнутой
 const getPartOfMatrix = (row, col) => {
   const partOfMatrix = []
-  const beginRow = row < 4? row: row - 4;
-  const beginCol = col < 4? col: col - 4;
+  const beginRow = row <= 4? row: row - 4;
+  const beginCol = col <= 4? col: col - 4;
   const endRow = +beginRow + 8;
   const endCol = +beginCol + 8;
 
@@ -133,12 +133,13 @@ const getPartOfMatrix = (row, col) => {
 };
 
 //проверяет все направления на существование победной линии
-const parsePartOfMatrixForWin = (rowId, colId) =>{
+const checkWin = (rowId, colId) =>{
   const currentStep = whichStep ? '1': '2'
 
   const partOfMatrix = getPartOfMatrix(rowId, colId)
 
   const directionsList = crateListOfDirections(partOfMatrix)
+  console.log("-> directionsList", directionsList);
 
   directionsList.forEach(direction=>{
     for(let i = 4; i < 9; i++){
@@ -154,10 +155,6 @@ const parsePartOfMatrixForWin = (rowId, colId) =>{
   return false
 }
 
-//проверка на окончание игры
-const checkWin = (rowId, colId) => {
-  parsePartOfMatrixForWin(rowId, colId)
-}
 //открывает модальное окно при окончании игры
 const endGame = () => {
   openModal(whoWinner())
@@ -175,10 +172,10 @@ export const resetGame = () => {
 
 //ход игрока
 export const move = (rowId, colId)  => {
-  console.log('winner', whoWinner())
   changeCellInMatrix(rowId, colId)
   increaseField(rowId, colId)
   checkWin(rowId, colId)
+  console.log("-> isGameOver", isGameOver);
 
   if(isGameOver){
     endGame()
