@@ -1,4 +1,4 @@
-import {clearField, renderField, openModal, closeModal} from "../render-controller/render-controller";
+import {clearField, renderField, openModal, closeModal} from "./render-controller";
 
 export let matrix = []; //матрица ячеек
 const rowCount = 20;

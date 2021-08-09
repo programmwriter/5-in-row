@@ -1,4 +1,4 @@
-import {move, resetGame} from "../game-controller/game-controller";
+import {move, resetGame} from "./game-controller";
 
 
 const field = document.querySelector('.field')

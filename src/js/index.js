@@ -1,6 +1,6 @@
 import '../scss/style.scss';
-import {matrix, fillMatrix} from "./game-controller/game-controller";
-import {addBtnsHandlers, renderField} from './render-controller/render-controller';
+import {matrix, fillMatrix} from "./game-controller";
+import {addBtnsHandlers, renderField} from './render-controller';
 addBtnsHandlers()
 fillMatrix();
 renderField(matrix)
